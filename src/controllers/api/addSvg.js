@@ -1,12 +1,21 @@
 const db = require('../../entities/Database');
 const Svg = require('../../entities/Svg');
+const { BadRequestApiError } = require('../../validators/errors/ApiError');
 
-module.exports = async (req, res) => {
-  const { content } = req.body;
+module.exports = async (req, res, next) => {
+  try {
+    const { content } = req.body;
 
-  const svgFile = new Svg();
+    if (!content) {
+      throw new BadRequestApiError('SVG content should not be empty');
+    }
 
-  await db.insert(svgFile, content);
+    const svgFile = new Svg();
 
-  res.json(svgFile.toPublicJSON());
+    await db.insert(svgFile, content);
+
+    return res.json(svgFile.toPublicJSON());
+  } catch (err) {
+    return next(err);
+  }
 };

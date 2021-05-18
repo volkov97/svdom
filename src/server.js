@@ -3,6 +3,7 @@ const express = require('express');
 const { svgFolder, PORT } = require('./config');
 const { apiRouter, mainRouter } = require('./routers');
 const setupMiddlewares = require('./middlewares');
+const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 
@@ -24,6 +25,8 @@ app.use('/api', apiRouter);
 
 // main routes
 app.use('/', mainRouter);
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);

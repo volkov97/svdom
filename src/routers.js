@@ -7,6 +7,7 @@ const likeSvg = require('./controllers/api/likeSvg');
 
 const ping = require('./controllers/ping');
 const pages = require('./controllers/pages');
+const svgExists = require('./validators/middlewares/svgExists');
 
 // routes for /api
 
@@ -14,7 +15,7 @@ const apiRouter = new Router();
 
 apiRouter.get('/svgs/:id', getSvg);
 apiRouter.post('/svgs', addSvg);
-apiRouter.put('/svgs/:id', likeSvg);
+apiRouter.put('/svgs/:id', svgExists, likeSvg);
 apiRouter.delete('/svgs/:id', deleteSvg);
 
 exports.apiRouter = apiRouter;
