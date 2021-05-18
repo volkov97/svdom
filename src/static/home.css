@@ -1,15 +1,3 @@
-html,
-body {
-  font-size: 20px;
-}
-
-.container {
-  margin: 0 auto;
-  padding: 20px 0;
-
-  max-width: 640px;
-}
-
 .svg-wrap {
   display: flex;
   align-items: center;
@@ -18,10 +6,6 @@ body {
 
 .svg-wrap img {
   width: 100%;
-}
-
-.ui.divider {
-  margin: 2rem 0;
 }
 
 .ui.segment.new-svg-form {

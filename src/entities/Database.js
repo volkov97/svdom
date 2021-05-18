@@ -69,7 +69,11 @@ class Database extends EventEmitter {
   }
 
   findOne(svgId) {
-    return this.idToSvg[svgId];
+    const svgRaw = this.idToSvg[svgId];
+
+    const svg = new Svg(svgRaw.id, svgRaw.createdAt);
+
+    return svg;
   }
 
   find(isLiked = false) {

@@ -50,6 +50,14 @@ app.put('/api/svgs/:id', async (req, res) => {
   return res.json({ isLiked });
 });
 
+app.use('/svg/:id', (req, res) => {
+  const svgId = req.params.id;
+
+  const svg = db.findOne(svgId).toPublicJSON();
+
+  return res.render('svg', { svg });
+});
+
 app.use('/', (req, res) => {
   const allSvgs = db.find().map((svg) => svg.toPublicJSON());
   const likedSvgs = db.find(true).map((svg) => svg.toPublicJSON());

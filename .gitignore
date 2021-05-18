@@ -6,3 +6,5 @@ db/**/*
 
 db/svg/*
 !db/svg/.gitkeep
+
+.DS_Store
