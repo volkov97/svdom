@@ -29,4 +29,6 @@ mainRouter.get('/ping', ping);
 mainRouter.get('/svg/:id', pages.svg);
 mainRouter.get('/', pages.home);
 
+mainRouter.use(pages.notFound);
+
 exports.mainRouter = mainRouter;
