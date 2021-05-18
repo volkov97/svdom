@@ -43,7 +43,7 @@ class Database extends EventEmitter {
     this.emit('changed');
   }
 
-  setBoookmarked(svgId, value) {
+  setLiked(svgId, value) {
     if (value === false) {
       delete this.likedIds[svgId];
     } else {

@@ -4,7 +4,7 @@ module.exports = async (req, res) => {
   const svgId = req.params.id;
   const isLiked = req.body.isLiked;
 
-  db.setBoookmarked(svgId, isLiked);
+  db.setLiked(svgId, isLiked);
 
   return res.json({ isLiked });
 };

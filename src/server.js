@@ -2,6 +2,7 @@ const path = require('path');
 const express = require('express');
 const { svgFolder, PORT } = require('./config');
 const { apiRouter, mainRouter } = require('./routers');
+const setupMiddlewares = require('./middlewares');
 
 const app = express();
 
@@ -9,8 +10,8 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
-// for application/json requests
-app.use(express.json());
+// setup other
+setupMiddlewares(app);
 
 // for static js/css assets
 app.use(express.static(path.resolve(__dirname, 'static')));
