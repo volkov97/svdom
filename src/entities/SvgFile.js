@@ -5,9 +5,9 @@ const { writeFile } = require('../utils/fs');
 const { generateId } = require('../utils/generateId');
 
 module.exports = class SvgFile {
-  constructor() {
-    this.id = generateId();
-    this.createdAt = Date.now();
+  constructor(id, createdAt) {
+    this.id = id || generateId();
+    this.createdAt = createdAt || Date.now();
 
     this.originalContent = null;
   }

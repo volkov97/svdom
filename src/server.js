@@ -16,15 +16,25 @@ app.post('/api/svgs', async (req, res) => {
 
   svgFile.setContent(content);
 
-  await svgFile.saveOriginal();
-
-  db.insert(svgFile);
+  await db.insert(svgFile);
 
   res.json(svgFile.toJSON());
 });
 
 app.get('/api/svgs', async (req, res) => {
   return res.json(db.toPublicJSON());
+});
+
+app.delete('/api/svgs/:id', async (req, res) => {
+  const svgId = req.params.id;
+
+  const svgFile = await db.remove(svgId);
+
+  if (svgFile === undefined) {
+    return res.status(404).end();
+  }
+
+  return res.json(svgFile.toJSON());
 });
 
 app.use('/files', express.static(svgFolder));

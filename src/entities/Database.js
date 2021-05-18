@@ -1,8 +1,10 @@
+const path = require('path');
 const { EventEmitter } = require('events');
 const { existsSync } = require('fs');
-const { dbDumpFile } = require('../config');
-const { writeFile } = require('../utils/fs');
+const { dbDumpFile, svgFolder } = require('../config');
+const { writeFile, removeFile } = require('../utils/fs');
 const { prettifyJsonToString } = require('../utils/prettifyJsonToString');
+const SvgFile = require('./SvgFile');
 
 const MAX_LATEST_SVG_COUNT = 50;
 
@@ -16,12 +18,20 @@ class Database extends EventEmitter {
       const dump = require(dbDumpFile);
 
       if (Array.isArray(dump.latestSvgs)) {
-        dump.latestSvgs.forEach((svg) => this.latestSvgs.push(svg));
+        dump.latestSvgs.forEach((svg) => {
+          const svgFile = new SvgFile(svg.id, svg.createdAt);
+
+          svgFile.setContent(svg.content);
+
+          this.latestSvgs.push(svgFile);
+        });
       }
     }
   }
 
-  insert(svgFile) {
+  async insert(svgFile) {
+    await svgFile.saveOriginal();
+
     if (this.latestSvgs.length < MAX_LATEST_SVG_COUNT) {
       this.latestSvgs.push(svgFile);
     } else {
@@ -32,6 +42,22 @@ class Database extends EventEmitter {
     this.emit('changed');
 
     return;
+  }
+
+  async remove(svgId) {
+    const svgToRemove = this.latestSvgs.find((svgFile) => svgFile.id === svgId);
+
+    if (svgToRemove === undefined) {
+      return undefined;
+    }
+
+    await removeFile(path.resolve(svgFolder, `${svgId}_original.svg`));
+
+    this.latestSvgs = this.latestSvgs.filter((svgFile) => svgFile.id !== svgId);
+
+    this.emit('changed');
+
+    return svgToRemove;
   }
 
   toPublicJSON() {
