@@ -1,7 +1,13 @@
 const http = require('http');
 
 const server = http.createServer((req, res) => {
-  return res.end('pong');
+  if (req.url === '/ping') {
+    return res.end('pong');
+  }
+
+  res.statusCode = 404;
+
+  return res.end('Not found');
 });
 
 const PORT = 3000;
