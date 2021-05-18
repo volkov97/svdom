@@ -1,136 +1,100 @@
-const path = require('path');
 const { EventEmitter } = require('events');
 const { existsSync } = require('fs');
-const { dbDumpFile, svgFolder } = require('../config');
-const { writeFile, removeFile } = require('../utils/fs');
+const { dbDumpFile } = require('../config');
+const { writeFile } = require('../utils/fs');
 const { prettifyJsonToString } = require('../utils/prettifyJsonToString');
-const SvgFile = require('./SvgFile');
-
-const MAX_LATEST_SVG_COUNT = 50;
+const Svg = require('./Svg');
 
 class Database extends EventEmitter {
   constructor() {
     super();
 
-    this.bookmarked = [];
-    this.latestSvgs = [];
+    this.likedIds = {};
+    this.idToSvg = {};
+  }
 
-    if (existsSync(dbDumpFile)) {
-      const dump = require(dbDumpFile);
+  async initFromDump() {
+    if (existsSync(dbDumpFile) === false) {
+      return;
+    }
 
-      if (Array.isArray(dump.latestSvgs)) {
-        dump.latestSvgs.forEach((svg) => {
-          const svgFile = new SvgFile(svg.id, svg.createdAt);
+    const dump = require(dbDumpFile);
 
-          svgFile.setContent(svg.content);
+    if (typeof dump.idToSvg === 'object') {
+      this.idToSvg = {};
 
-          this.latestSvgs.push(svgFile);
-        });
+      for (let id in dump.idToSvg) {
+        const svg = dump.idToSvg[id];
+
+        this.idToSvg[id] = new Svg(svg.id, svg.createdAt);
       }
+    }
 
-      if (Array.isArray(dump.bookmarked)) {
-        dump.bookmarked.forEach((svg) => {
-          const svgFile = new SvgFile(svg.id, svg.createdAt);
-
-          svgFile.setContent(svg.content);
-
-          this.bookmarked.push(svgFile);
-        });
-      }
+    if (typeof dump.likedIds === 'object') {
+      this.likedIds = { ...dump.likedIds };
     }
   }
 
-  async insert(svgFile) {
-    await svgFile.saveOriginal();
+  async insert(svg, originalContent) {
+    await svg.saveOriginal(originalContent);
 
-    if (this.latestSvgs.length < MAX_LATEST_SVG_COUNT) {
-      this.latestSvgs.push(svgFile);
-    } else {
-      this.latestSvgs.pop();
-      this.latestSvgs.push(svgFile);
-    }
+    this.idToSvg[svg.id] = svg;
 
     this.emit('changed');
-
-    return;
   }
 
   setBoookmarked(svgId, value) {
-    const foundSvgFile = this.latestSvgs.find(
-      (svgFile) => svgFile.id === svgId
-    );
-
-    const foundInBoookmarked = this.bookmarked.find(
-      (svgFile) => svgFile.id === svgId
-    );
-
-    if (value === true) {
-      if (foundInBoookmarked) {
-        return;
-      }
-
-      if (foundSvgFile) {
-        const copy = new SvgFile(foundSvgFile.id, foundSvgFile.createdAt);
-
-        this.bookmarked.push(copy);
-
-        this.emit('changed');
-
-        return copy;
-      } else {
-        return;
-      }
-    }
-
     if (value === false) {
-      if (!foundInBoookmarked) {
-        return;
-      }
-
-      this.bookmarked = this.bookmarked.filter(
-        (svgFile) => svgFile.id !== svgId
-      );
-
-      this.emit('changed');
-
-      return foundInBoookmarked;
+      delete this.likedIds[svgId];
+    } else {
+      this.likedIds[svgId] = true;
     }
 
-    return;
+    this.emit('changed');
   }
 
   async remove(svgId) {
-    const svgToRemove = this.latestSvgs.find((svgFile) => svgFile.id === svgId);
+    const svgRaw = this.idToSvg[svgId];
 
-    if (svgToRemove === undefined) {
-      return undefined;
-    }
+    const svg = new Svg(svgRaw.id, svgRaw.createdAt);
 
-    await removeFile(path.resolve(svgFolder, `${svgId}_original.svg`));
+    await svg.removeOriginal();
 
-    this.latestSvgs = this.latestSvgs.filter((svgFile) => svgFile.id !== svgId);
+    delete this.idToSvg[svgId];
+    delete this.likedIds[svgId];
 
     this.emit('changed');
 
-    return svgToRemove;
+    return svgId;
   }
 
-  toPublicJSON() {
-    return {
-      latestSvgs: this.latestSvgs,
-      bookmarked: this.bookmarked,
-    };
+  findOne(svgId) {
+    return this.idToSvg[svgId];
+  }
+
+  find(isLiked = false) {
+    let allSvgs = Object.values(this.idToSvg);
+
+    if (isLiked === true) {
+      allSvgs = allSvgs.filter((svg) => this.likedIds[svg.id]);
+    }
+
+    allSvgs.sort((svgA, svgB) => svgB.createdAt - svgA.createdAt);
+
+    return allSvgs;
   }
 
   toJSON() {
     return {
-      latestSvgs: this.latestSvgs,
-      bookmarked: this.bookmarked,
+      idToSvg: this.idToSvg,
+      likedIds: this.likedIds,
     };
   }
 }
 
 const db = new Database();
+
+db.initFromDump();
 
 db.on('changed', () => {
   writeFile(dbDumpFile, prettifyJsonToString(db.toJSON()));
