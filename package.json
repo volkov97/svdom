@@ -1,0 +1,21 @@
+{
+  "name": "svdom",
+  "version": "1.0.0",
+  "description": "House for optimized SVG files",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
+  },
+  "author": "German Volkov (volkov.german.1997@gmail.com)",
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "^6.0.0",
+    "lint-staged": "^11.0.0",
+    "prettier": "^2.3.0"
+  },
+  "lint-staged": {
+    "*.{js,css,md}": "prettier --write"
+  }
+}
