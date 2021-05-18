@@ -12,6 +12,7 @@ class Database extends EventEmitter {
   constructor() {
     super();
 
+    this.bookmarked = [];
     this.latestSvgs = [];
 
     if (existsSync(dbDumpFile)) {
@@ -24,6 +25,16 @@ class Database extends EventEmitter {
           svgFile.setContent(svg.content);
 
           this.latestSvgs.push(svgFile);
+        });
+      }
+
+      if (Array.isArray(dump.bookmarked)) {
+        dump.bookmarked.forEach((svg) => {
+          const svgFile = new SvgFile(svg.id, svg.createdAt);
+
+          svgFile.setContent(svg.content);
+
+          this.bookmarked.push(svgFile);
         });
       }
     }
@@ -40,6 +51,50 @@ class Database extends EventEmitter {
     }
 
     this.emit('changed');
+
+    return;
+  }
+
+  setBoookmarked(svgId, value) {
+    const foundSvgFile = this.latestSvgs.find(
+      (svgFile) => svgFile.id === svgId
+    );
+
+    const foundInBoookmarked = this.bookmarked.find(
+      (svgFile) => svgFile.id === svgId
+    );
+
+    if (value === true) {
+      if (foundInBoookmarked) {
+        return;
+      }
+
+      if (foundSvgFile) {
+        const copy = new SvgFile(foundSvgFile.id, foundSvgFile.createdAt);
+
+        this.bookmarked.push(copy);
+
+        this.emit('changed');
+
+        return copy;
+      } else {
+        return;
+      }
+    }
+
+    if (value === false) {
+      if (!foundInBoookmarked) {
+        return;
+      }
+
+      this.bookmarked = this.bookmarked.filter(
+        (svgFile) => svgFile.id !== svgId
+      );
+
+      this.emit('changed');
+
+      return foundInBoookmarked;
+    }
 
     return;
   }
@@ -63,12 +118,14 @@ class Database extends EventEmitter {
   toPublicJSON() {
     return {
       latestSvgs: this.latestSvgs,
+      bookmarked: this.bookmarked,
     };
   }
 
   toJSON() {
     return {
       latestSvgs: this.latestSvgs,
+      bookmarked: this.bookmarked,
     };
   }
 }
