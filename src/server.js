@@ -1,17 +1,11 @@
-const http = require('http');
+const express = require('express');
 
-const server = http.createServer((req, res) => {
-  if (req.url === '/ping') {
-    return res.end('pong');
-  }
+const app = express();
 
-  res.statusCode = 404;
-
-  return res.end('Not found');
-});
+app.get('/ping', (req, res) => res.end('pong'));
 
 const PORT = 3000;
 
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
