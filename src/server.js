@@ -1,8 +1,7 @@
 const express = require('express');
+const { svgFolder } = require('./config');
 const db = require('./entities/Database');
 const SvgFile = require('./entities/SvgFile');
-
-const generateId = require('./utils/generateId');
 
 const app = express();
 
@@ -23,6 +22,12 @@ app.post('/api/svgs', async (req, res) => {
 
   res.json(svgFile.toJSON());
 });
+
+app.get('/api/svgs', async (req, res) => {
+  return res.json(db.toPublicJSON());
+});
+
+app.use('/files', express.static(svgFolder));
 
 const PORT = 3000;
 

@@ -34,6 +34,12 @@ class Database extends EventEmitter {
     return;
   }
 
+  toPublicJSON() {
+    return {
+      latestSvgs: this.latestSvgs,
+    };
+  }
+
   toJSON() {
     return {
       latestSvgs: this.latestSvgs,
