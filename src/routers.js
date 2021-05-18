@@ -1,11 +1,7 @@
 const { Router } = require('express');
 
-const addSvg = require('./controllers/api/addSvg');
-const getSvg = require('./controllers/api/getSvg');
-const deleteSvg = require('./controllers/api/deleteSvg');
-const likeSvg = require('./controllers/api/likeSvg');
-
 const ping = require('./controllers/ping');
+const api = require('./controllers/api');
 const pages = require('./controllers/pages');
 const svgExists = require('./validators/middlewares/svgExists');
 
@@ -13,10 +9,11 @@ const svgExists = require('./validators/middlewares/svgExists');
 
 const apiRouter = new Router();
 
-apiRouter.get('/svgs/:id', getSvg);
-apiRouter.post('/svgs', addSvg);
-apiRouter.put('/svgs/:id', svgExists, likeSvg);
-apiRouter.delete('/svgs/:id', deleteSvg);
+apiRouter.get('/svgs', api.getSvgs);
+apiRouter.get('/svgs/:id', api.getSvg);
+apiRouter.post('/svgs', api.addSvg);
+apiRouter.put('/svgs/:id', svgExists, api.likeSvg);
+apiRouter.delete('/svgs/:id', api.deleteSvg);
 
 exports.apiRouter = apiRouter;
 

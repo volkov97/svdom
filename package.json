@@ -20,7 +20,11 @@
     "*.{js,css,md}": "prettier --write"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
+    "express-rate-limit": "^5.2.6",
+    "express-slow-down": "^1.4.0",
+    "helmet": "^4.6.0",
     "morgan": "^1.10.0",
     "pug": "^3.0.2",
     "uuid": "^8.3.2"
