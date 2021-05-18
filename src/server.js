@@ -1,6 +1,6 @@
 const path = require('path');
 const express = require('express');
-const { svgFolder, PORT } = require('./config');
+const { PORT } = require('./config');
 const { apiRouter, mainRouter } = require('./routers');
 const setupMiddlewares = require('./middlewares');
 const errorHandler = require('./middlewares/errorHandler');
@@ -16,9 +16,6 @@ setupMiddlewares(app);
 
 // for static js/css assets
 app.use(express.static(path.resolve(__dirname, 'static')));
-
-// for svg uploaded files
-app.use('/files', express.static(svgFolder));
 
 // api routes
 app.use('/api', apiRouter);

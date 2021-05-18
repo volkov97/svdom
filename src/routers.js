@@ -26,6 +26,7 @@ const mainRouter = new Router();
 
 mainRouter.get('/ping', ping);
 
+mainRouter.use('/files/:filename', pages.downloadSvg);
 mainRouter.get('/svg/:id', pages.svg);
 mainRouter.get('/', pages.home);
 
