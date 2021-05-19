@@ -1,9 +1,11 @@
+const http = require('http');
 const path = require('path');
 const express = require('express');
 const { PORT } = require('./config');
 const { apiRouter, mainRouter } = require('./routers');
 const setupMiddlewares = require('./middlewares');
 const errorHandler = require('./middlewares/errorHandler');
+const upgradeWs = require('./ws');
 
 const app = express();
 
@@ -25,6 +27,10 @@ app.use('/', mainRouter);
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+const server = http.createServer(app);
+
+upgradeWs(server);
+
+server.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
