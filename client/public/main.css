@@ -1,0 +1,41 @@
+html,
+body {
+  font-size: 20px;
+}
+
+.container {
+  margin: 0 auto;
+  padding: 20px 0;
+
+  max-width: 800px;
+}
+
+.ui.divider {
+  margin: 2rem 0;
+}
+
+.svg-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svg-wrap img {
+  width: 100%;
+}
+
+.ui.segment.new-svg-form {
+  margin: 2rem 0;
+}
+
+.ui.breadcrumb {
+  margin: 2rem 0 0;
+}
+
+.ui.segment img {
+  width: 100%;
+}
+
+.loading-wrap {
+  padding: 30px 0;
+}
