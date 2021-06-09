@@ -31,7 +31,7 @@ block content
               a(href=`/svg/${svg.id}`)
                 button.mini.ui.button Open
               button.mini.ui.button.likeSvgButton.icon(data-id=svg.id data-like="false")
-                i.heart.icon.outline
+                i.heart.icon.red
               button.mini.ui.button.right.floated.icon.removeSvgButton(data-id=svg.id)
                 i.trash.icon
     else
@@ -54,7 +54,7 @@ block content
               a(href=`/svg/${svg.id}`)
                 button.mini.ui.button Open
               button.mini.ui.button.icon.likeSvgButton(data-id=svg.id data-like="true")
-                i.heart.red.icon
+                i.heart.outline.icon
               button.mini.ui.button.icon.right.floated.removeSvgButton(data-id=svg.id)
                 i.trash.icon
     else
